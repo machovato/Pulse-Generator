@@ -10,6 +10,8 @@ import {
     Keyboard,
 } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: "DTN Project Pulse — Presentation Engine",
     description: "Create and present project updates with the DTN meeting presentation engine.",

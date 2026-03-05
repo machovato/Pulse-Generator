@@ -3,6 +3,8 @@ import prisma from "@/lib/db";
 import { PresentationClient } from "./PresentationClient";
 import { LooseDeckSchema } from "@/lib/schema";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
     params: { id: string };
 }
