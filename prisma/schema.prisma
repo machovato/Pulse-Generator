@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+// LOCAL DEV: provider = "sqlite"  + DATABASE_URL="file:./dev.db"
+// RAILWAY:   Change provider to "postgresql" and set DATABASE_URL to the Railway connection string.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Update {
+  id             String   @id @default(cuid())
+  title          String
+  date           DateTime
+  template       String
+  rag            String?
+  content_json   String
+  source_raw     String
+  schema_version Int      @default(1)
+  created_at     DateTime @default(now())
+}

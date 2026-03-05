@@ -1,0 +1,25 @@
+# Node
+node_modules/
+.next/
+.turbo/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Database
+prisma/*.db
+prisma/*.db-journal
+
+# Build
+dist/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp

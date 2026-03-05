@@ -1,0 +1,102 @@
+"use client";
+
+import { motion } from "framer-motion";
+import * as LucideIcons from "lucide-react";
+import { LayoutWhite } from "./layouts/LayoutWhite";
+import type { LooseSlide } from "@/lib/schema";
+
+interface KPIItem {
+    label: string;
+    value: string;
+    icon?: string;
+    trend?: "up" | "down" | "flat";
+    note?: string;
+}
+
+interface KpisData {
+    items: KPIItem[];
+}
+
+// Trend arrows communicate KPI performance direction:
+// up   = DTN Accent Lime #8DC63F  — positive performance indicator
+// down = DTN Red         #C8192B  — negative, attention needed
+// flat = DTN Neutral Mid #BCBEC0  — no significant change
+function TrendIcon({ trend }: { trend?: "up" | "down" | "flat" }) {
+    if (!trend) return null;
+    if (trend === "up") return <LucideIcons.TrendingUp className="w-5 h-5" style={{ color: "#8DC63F" }} />;
+    if (trend === "down") return <LucideIcons.TrendingDown className="w-5 h-5" style={{ color: "#C8192B" }} />;
+    return <LucideIcons.Minus className="w-5 h-5" style={{ color: "#BCBEC0" }} />;
+}
+
+function getIcon(name?: string) {
+    if (!name) return null;
+    const key = name.charAt(0).toUpperCase() + name.slice(1);
+    const Icon = (LucideIcons as Record<string, unknown>)[key] as React.ComponentType<{ className?: string }>;
+    return Icon ? <Icon className="w-6 h-6 text-[#1B8FE0]" /> : null;
+}
+
+export function KpisSlide({ slide }: { slide: LooseSlide }) {
+    const data = (slide.data ?? { items: [] }) as unknown as KpisData;
+    const items = data.items ?? [];
+    const cols = items.length <= 2 ? 2 : items.length === 3 ? 3 : 4;
+
+    return (
+        <LayoutWhite center={false}>
+            {/* Slide title — eyebrow style at top */}
+            <motion.p
+                className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1B8FE0] mb-8 pt-10 text-center w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+            >
+                {slide.title}
+            </motion.p>
+
+            {/* KPI scoreboard — centered, generous space */}
+            <div className="flex-1 flex items-center justify-center w-full">
+                <div
+                    className="grid gap-8 w-full max-w-5xl"
+                    style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+                >
+                    {items.map((kpi, i) => (
+                        <motion.div
+                            key={i}
+                            className="flex flex-col items-center text-center gap-3"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.45, delay: 0.1 + i * 0.08 }}
+                        >
+                            {/* Icon */}
+                            {kpi.icon && (
+                                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-1">
+                                    {getIcon(kpi.icon)}
+                                </div>
+                            )}
+
+                            {/* Value — scoreboard */}
+                            <div className="flex items-baseline gap-2">
+                                <span
+                                    className="font-bold text-[#003057] whitespace-nowrap"
+                                    style={{ fontSize: "clamp(36px, 4vw, 60px)", lineHeight: 1 }}
+                                >
+                                    {kpi.value}
+                                </span>
+                                <TrendIcon trend={kpi.trend} />
+                            </div>
+
+                            {/* Label */}
+                            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6D6E71]">
+                                {kpi.label}
+                            </span>
+
+                            {/* Note */}
+                            {kpi.note && (
+                                <span className="text-xs text-gray-400">{kpi.note}</span>
+                            )}
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </LayoutWhite>
+    );
+}

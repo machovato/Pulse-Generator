@@ -1,0 +1,108 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { LayoutSplit } from "./layouts/LayoutSplit";
+import type { LooseSlide } from "@/lib/schema";
+
+interface AgendaItem {
+    topic: string;
+    time?: string;
+    owner?: string;
+}
+
+interface AgendaData {
+    items: AgendaItem[];
+}
+
+export function AgendaSlide({ slide }: { slide: LooseSlide }) {
+    const data = (slide.data ?? { items: [] }) as unknown as AgendaData;
+    const items = data.items ?? [];
+
+    const left = (
+        <div className="flex flex-col gap-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
+                Agenda
+            </p>
+            <h2
+                className="font-bold text-white leading-tight"
+                style={{ fontSize: "clamp(28px, 3.2vw, 44px)" }}
+            >
+                {slide.title}
+            </h2>
+            <div className="w-8 h-0.5 bg-white/30 mt-2" />
+            {items.length > 0 && (
+                <p className="text-white/50 text-sm mt-1">
+                    {items.length} item{items.length !== 1 ? "s" : ""}
+                </p>
+            )}
+        </div>
+    );
+
+    const right = (
+        // @container allows children to scale based on this panel's width
+        <div className="flex flex-col h-full justify-between py-2 w-full @container">
+            {items.map((item, i) => (
+                <motion.div
+                    key={i}
+                    className="flex items-center gap-5 flex-1"
+                    style={{
+                        // Proportional padding between items — not fixed px value
+                        paddingTop: "clamp(6px, 0.8vh, 14px)",
+                        paddingBottom: "clamp(6px, 0.8vh, 14px)",
+                        borderBottom: i < items.length - 1
+                            ? "1px solid #E6E7E8"
+                            : "none",
+                    }}
+                    initial={{ opacity: 0, x: 14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
+                >
+                    {/* Number badge — sized for presentation readability */}
+                    <div
+                        className="rounded-full bg-[#1B8FE0] flex items-center justify-center shrink-0 text-white font-bold"
+                        style={{
+                            width: "clamp(32px, 6cqi, 48px)",
+                            height: "clamp(32px, 6cqi, 48px)",
+                            fontSize: "clamp(12px, 2.2cqi, 18px)",
+                        }}
+                    >
+                        {i + 1}
+                    </div>
+
+                    {/* Topic + meta */}
+                    <div className="flex-1 min-w-0">
+                        <p
+                            className="font-bold text-[#003057] leading-tight"
+                            style={{ fontSize: "clamp(16px, 3.2cqi, 28px)" }}
+                        >
+                            {item.topic}
+                        </p>
+                        <div className="flex gap-4 mt-2 flex-wrap items-center">
+                            {item.time && (
+                                <span
+                                    className="text-[#1B8FE0] font-bold bg-blue-50 border border-blue-100 rounded"
+                                    style={{
+                                        fontSize: "clamp(11px, 1.8cqi, 16px)",
+                                        padding: "clamp(2px, 0.4cqi, 4px) clamp(6px, 1cqi, 12px)"
+                                    }}
+                                >
+                                    {item.time}
+                                </span>
+                            )}
+                            {item.owner && (
+                                <span
+                                    className="text-[#6D6E71] font-semibold"
+                                    style={{ fontSize: "clamp(12px, 1.8cqi, 16px)" }}
+                                >
+                                    {item.owner}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </motion.div>
+            ))}
+        </div>
+    );
+
+    return <LayoutSplit leftContent={left} rightContent={right} />;
+}

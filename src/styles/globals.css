@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  DTN OFFICIAL COLOR PALETTE                                                 */
+/*  Source: DTN Brand Guidelines (uploaded palette image, March 2026)          */
+/*  Do not introduce hex values outside this palette.                          */
+/* ─────────────────────────────────────────────────────────────────────────── */
+:root {
+
+  /* PRIMARY ─── The two core brand colors */
+  --dtn-blue: #1B8FE0;
+  /* DTN Primary Blue */
+  --dtn-green: #4CB944;
+  /* DTN Primary Green */
+
+  /* SECONDARY ─── Supporting brand colors */
+  --dtn-navy: #003057;
+  /* DTN Navy (darkest secondary — headings, anchors) */
+  --dtn-blue-mid: #2255A4;
+  /* DTN Mid Blue (interactive secondary, links) */
+  --dtn-green-dark: #005741;
+  /* DTN Dark Green (success alt, environment) */
+  --dtn-teal: #007074;
+  /* DTN Teal (data viz, info state) */
+  --dtn-red: #C8192B;
+  /* DTN Red (error, off-track, escalation) */
+  --dtn-orange: #F5A400;
+  /* DTN Orange (alert, at-risk — warm) */
+
+  /* ACCENT ─── Emphasis, highlights, interactive states */
+  --dtn-cyan: #00B5CC;
+  /* DTN Cyan (interactive focus, accent highlight) */
+  --dtn-lime: #8DC63F;
+  /* DTN Lime (positive accent, badge callout) */
+  --dtn-yellow: #FFCD00;
+  /* DTN Yellow (warning, at-risk — cool) */
+
+  /* NEUTRAL ─── Text hierarchy, borders, surfaces */
+  --dtn-neutral-dark: #6D6E71;
+  /* Text/body, icons on white */
+  --dtn-neutral-mid: #BCBEC0;
+  /* Muted text, placeholder, disabled */
+  --dtn-neutral-light: #E6E7E8;
+  /* Borders, dividers, card strokes */
+  --dtn-neutral-bg: #F5F7FA;
+  /* App background surface */
+
+  /* ─── SEMANTIC ROLE TOKENS ──────────────────────────────────────────────── */
+  /*  Map raw palette → semantic intent. Use these in components.             */
+
+  /* Brand */
+  --color-brand: var(--dtn-blue);
+  --color-brand-alt: var(--dtn-green);
+
+  /* Status / State indicators  (use secondary palette) */
+  --color-success: var(--dtn-green);
+  /* On Track, done */
+  --color-success-bg: #EDFAEB;
+  /* Green tint (derived) */
+  --color-success-border: #B4DFB0;
+  /* Green stroke (derived) */
+  --color-success-text: var(--dtn-green-dark);
+  /* Dark green for text */
+  --color-warning: var(--dtn-yellow);
+  /* At Risk */
+  --color-warning-bg: #FFF8DC;
+  /* Yellow tint (derived) */
+  --color-warning-border: var(--dtn-yellow);
+  /* Yellow stroke */
+  --color-warning-text: #8A6A00;
+  /* Dark gold for text (derived) */
+  --color-error: var(--dtn-red);
+  /* Off Track, blocked */
+  --color-error-bg: #FDEAEC;
+  /* Red tint (derived) */
+  --color-error-border: #F0A0A8;
+  /* Red stroke (derived) */
+  --color-error-text: #8B0F1A;
+  /* Dark red for text (derived) */
+  --color-info: var(--dtn-teal);
+  /* Informational */
+  --color-info-bg: #E0F4F5;
+  /* Teal tint (derived) */
+
+  /* Interactive */
+  --color-interactive: var(--dtn-blue);
+  --color-interactive-2: var(--dtn-blue-mid);
+  --color-focus: var(--dtn-cyan);
+  /* Focus ring / active accent */
+
+  /* Emphasis */
+  --color-accent: var(--dtn-cyan);
+  --color-accent-alt: var(--dtn-lime);
+
+  /* Text hierarchy */
+  --color-text-heading: var(--dtn-navy);
+  --color-text-body: var(--dtn-neutral-dark);
+  --color-text-muted: var(--dtn-neutral-mid);
+
+  /* Borders & surfaces */
+  --color-border: var(--dtn-neutral-light);
+  --color-surface: var(--dtn-neutral-bg);
+  --color-surface-card: #FFFFFF;
+
+  /* ─── LEGACY ALIASES (for existing var() usages — do not add new usages) ── */
+  --dtn-neutral: var(--dtn-navy);
+  /* was #1A2B3C → navy now */
+  --dtn-muted: var(--dtn-neutral-dark);
+  /* was #5A6B7A → neutral-dark */
+  --dtn-bg: var(--dtn-neutral-bg);
+  --card-border: var(--dtn-neutral-light);
+  --card-shadow: 0 1px 4px rgba(0, 48, 87, 0.06), 0 2px 8px rgba(0, 48, 87, 0.04);
+  --radius: 0.5rem;
+
+  /* ─── GRADIENT UTILITIES ─────────────────────────────────────────────────── */
+  /*  All gradients built exclusively from official palette values             */
+  --dtn-gradient-blue: linear-gradient(135deg, #1B8FE0 0%, #1672B8 60%, #003057 100%);
+  --dtn-gradient-navy: linear-gradient(160deg, #2255A4 0%, #003057 100%);
+  --dtn-gradient-timeline: linear-gradient(90deg, #1B8FE0 0%, #4CB944 100%);
+
+  /* ─── TYPOGRAPHY SCALE ───────────────────────────────────────────────────── */
+  --type-display: clamp(40px, 5vw, 68px);
+  --type-headline: clamp(28px, 3.5vw, 48px);
+  --type-subheadline: clamp(20px, 2vw, 28px);
+  --type-body: clamp(14px, 1.3vw, 16px);
+  --type-kpi-value: clamp(36px, 4vw, 60px);
+  --type-eyebrow: 11px;
+}
+
+/* ─── Base resets ───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--color-text-body);
+  background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography utilities ──────────────────────────────────────────────── */
+.eyebrow {
+  font-size: var(--type-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dtn-blue);
+}
+
+/* ─── Card base ─────────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+}
+
+/* ─── RAG pills — status indicators using official palette ─────────────── */
+/*  Green  → Primary Green + Dark Green text                                */
+/*  Yellow → Accent Yellow + dark gold text                                 */
+/*  Red    → Secondary Red + dark red text                                  */
+.rag-green {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  border: 1px solid var(--color-success-border);
+}
+
+.rag-yellow {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border: 1px solid var(--color-warning-border);
+}
+
+.rag-red {
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+  border: 1px solid var(--color-error-border);
+}
+
+.rag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ─── Print: restore DTN footer, hide all screen chrome ────────────────── */
+@media print {
+
+  nav,
+  footer,
+  .no-print,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  body::after {
+    content: 'DTN \B7 Proprietary and Confidential';
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: var(--dtn-neutral-dark);
+    padding: 8px;
+    border-top: 1px solid var(--dtn-neutral-light);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .slide-page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .slide-page:last-child {
+    page-break-after: auto;
+  }
+
+  @page {
+    size: landscape;
+    margin: 0;
+  }
+}
