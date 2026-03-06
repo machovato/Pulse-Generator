@@ -42,7 +42,7 @@ export function SlideRenderer({ slide, density, deckMeta, schemaVersion = 1 }: S
 
     // Default V2 / Generic mapping
     switch (slide.type) {
-        case "hero": return <HeroSlide slide={slide} deckMeta={deckMeta} />;
+        case "hero": return <HeroSlide slide={slide} />;
         case "kpis": return <KpisSlide slide={slide} />;
         case "pipeline": return <PipelineSlide slide={slide} />;
         case "grid": return <GridSlide slide={slide} />;

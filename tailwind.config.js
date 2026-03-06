@@ -129,6 +129,9 @@ module.exports = {
                 "fade-up": "fadeUp 0.4s ease forwards",
                 "pulse-cta": "pulseCta 2s ease-in-out infinite",
             },
+            boxShadow: {
+                card: "0 4px 20px rgba(0,0,0,0.06)",
+            },
             keyframes: {
                 ripple: {
                     "0%": { transform: "scale(1)", opacity: "0.6" },
