@@ -44,8 +44,7 @@ export function HeroSlide({ slide }: { slide: LooseSlide }) {
     return (
         <LayoutBrand>
             <div className={cn(
-                "flex flex-col h-full px-slide pb-slide pt-12",
-                isStrategy ? "justify-center" : "justify-end pb-32"
+                "flex flex-col h-full px-slide pb-slide pt-12 justify-center"
             )}>
                 {/* Eyebrow */}
                 <motion.p
@@ -59,8 +58,11 @@ export function HeroSlide({ slide }: { slide: LooseSlide }) {
 
                 {/* Title — Display size */}
                 <motion.h1
-                    className="font-bold text-text-on-hero text-slide-title leading-tight mb-4"
-                    style={{ fontWeight: "var(--font-weight-title)" }}
+                    className={cn(
+                        "font-extrabold text-text-on-hero leading-none mb-6 tracking-tight",
+                        isStrategy ? "text-slide-title" : ""
+                    )}
+                    style={{ fontSize: isStrategy ? undefined : "clamp(48px, 6.5vw, 96px)" }}
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.15, delay: 0.05 }}
@@ -139,7 +141,13 @@ export function HeroSlide({ slide }: { slide: LooseSlide }) {
                                     </span>
                                 </div>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-text-on-hero font-bold text-metric-lg" style={{ lineHeight: 1 }}>
+                                    <span
+                                        className={cn(
+                                            "text-text-on-hero font-bold",
+                                            isStrategy ? "text-metric-lg" : "text-metric-medium"
+                                        )}
+                                        style={{ lineHeight: 1 }}
+                                    >
                                         {kpi.value}
                                     </span>
                                     <TrendIcon trend={kpi.trend} />

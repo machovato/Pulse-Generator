@@ -178,7 +178,7 @@ export function TimelineSlide({ slide }: { slide: LooseSlide }) {
                                             </div>
                                         ) : (
                                             /* Status Inline Layout (Restoration) */
-                                            <div className="flex flex-col gap-1 w-full max-w-sm transition-all">
+                                            <div className="flex flex-col gap-1 w-full max-w-xl transition-all">
                                                 <h3 className={cn(
                                                     "font-bold text-card-title leading-tight",
                                                     m.state === "upcoming" ? "text-text-muted opacity-60" : "text-text-primary"
