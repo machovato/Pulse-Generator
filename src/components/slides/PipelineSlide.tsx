@@ -8,6 +8,10 @@ import { LayoutWhite } from "./layouts/LayoutWhite";
 import type { LooseSlide } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { useTemplate } from "@/components/TemplateContext";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface Step {
     label: string;
@@ -72,136 +76,104 @@ export function PipelineSlide({ slide, disableAnimation = false }: { slide: Loos
             animate="visible"
         >
             <LayoutWhite center={false}>
-                <motion.p
-                    className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info pt-10 pb-0 text-center w-full"
-                    variants={slideUpItem(disableAnimation)}
-                >
-                    Pipeline
-                </motion.p>
+                <motion.div variants={slideUpItem(disableAnimation)}>
+                    <Typography variant="eyebrow" className="text-accent-info pt-10 pb-0 text-center w-full">
+                        Pipeline
+                    </Typography>
+                </motion.div>
 
-                <motion.h2
-                    className="font-bold text-text-primary text-center mb-0 mt-2"
-                    style={{ fontSize: "clamp(28px, 3vw, 44px)" }}
-                    variants={slideUpItem(disableAnimation)}
-                >
-                    {slide.title}
-                </motion.h2>
+                <motion.div variants={slideUpItem(disableAnimation)}>
+                    <Typography as="h2" variant="h1" className="text-center mb-0 mt-2">
+                        {slide.title}
+                    </Typography>
+                </motion.div>
 
                 <div className="flex-1 flex flex-col w-full h-full overflow-hidden">
                     {!isStrategy ? (
-                        /* Status Kanban Layout */
-                        <div className="flex-1 flex gap-section overflow-x-auto px-slide pb-slide pt-8 items-stretch">
-                            {steps.map((step, i) => {
-                                const status = step.status ?? "next";
-                                const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.next;
-                                let IconComponent = resolveIconFromLabel(step.label);
+                        /* Horizontal Swimlane Layout */
+                        <div className="flex-1 w-full px-12 xl:px-24 pb-12 pt-16 flex flex-col justify-center">
+                            <div className="grid w-full relative" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>
+                                {steps.map((step, i) => {
+                                    const status = step.status ?? "next";
+                                    const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.next;
+                                    let IconComponent = resolveIconFromLabel(step.label);
 
-                                // Asymmetric layout logic
-                                const isCurrent = status === "current";
-                                const columnWidthClass = isCurrent
-                                    ? "flex-auto basis-[45%] min-w-[400px] max-w-[600px]"
-                                    : "flex-1 basis-[15%] min-w-[220px] max-w-[280px]";
+                                    const isCurrent = status === "current";
+                                    const isDone = status === "done";
+                                    const isFirst = i === 0;
+                                    const isPrevDone = !isFirst && steps[i - 1].status === "done";
 
-                                return (
-                                    <motion.div
-                                        key={i}
-                                        className={cn("flex flex-col gap-4 transition-all duration-300", columnWidthClass)}
-                                        variants={staggerContainer(disableAnimation)}
-                                    >
-                                        {/* Column Header - Fixed Height for Alignment */}
-                                        <motion.div
-                                            className={cn(
-                                                "px-4 py-3 rounded-t-lg flex flex-col justify-center min-h-[4.5rem]",
-                                                isCurrent ? "bg-dtn-navy border border-dtn-navy border-b-0" : "bg-surface-muted border border-border-default border-b-2"
+                                    return (
+                                        <div key={i} className="flex flex-col items-center relative gap-4">
+                                            {/* Incoming Spine Segment */}
+                                            {!isFirst && (
+                                                <div className={cn(
+                                                    "absolute top-[40px] right-[50%] w-full h-1 -z-10 transition-colors duration-500",
+                                                    isPrevDone ? "bg-accent-success" : "bg-border-default/60"
+                                                )} />
                                             )}
-                                            variants={slideUpItem(disableAnimation)}
-                                        >
-                                            <div className="flex items-start justify-between gap-3 w-full">
-                                                <div className="flex items-start gap-2 max-w-[70%]">
-                                                    <IconComponent className={cn("w-5 h-5 shrink-0 mt-0.5", isCurrent ? "text-white" : cfg.statusClass)} />
-                                                    <span className={cn(
-                                                        "font-bold text-card-title uppercase tracking-wider leading-tight",
-                                                        isCurrent ? "text-white" : "text-text-primary"
-                                                    )}>
-                                                        {step.label}
-                                                    </span>
-                                                </div>
-                                                <span className={cn(
-                                                    "text-[10px] font-bold uppercase shrink-0 mt-1",
-                                                    isCurrent ? "text-dtn-cyan drop-shadow-sm" : cfg.statusClass
+
+                                            {/* Node Circle */}
+                                            <motion.div
+                                                className={cn(
+                                                    "w-20 h-20 rounded-full flex items-center justify-center border-[4px] bg-surface-page relative z-10 transition-all shadow-sm",
+                                                    isCurrent ? "border-accent-info shadow-[0_0_20px_rgba(20,151,227,0.25)] scale-110" :
+                                                        isDone ? "border-accent-success" : "border-border-default"
+                                                )}
+                                                variants={slideUpItem(disableAnimation)}
+                                            >
+                                                {isDone ? (
+                                                    <LucideIcons.Check className="w-8 h-8 text-accent-success" strokeWidth={3} />
+                                                ) : (
+                                                    <IconComponent className={cn("w-8 h-8", isCurrent ? "text-accent-info" : "text-border-muted")} strokeWidth={isCurrent ? 2.5 : 2} />
+                                                )}
+                                            </motion.div>
+
+                                            {/* Node Labels */}
+                                            <motion.div
+                                                className="flex flex-col items-center text-center px-4 w-full gap-2 mt-2"
+                                                variants={slideUpItem(disableAnimation)}
+                                            >
+                                                <Typography variant="badge" className={cn("px-3 py-1 rounded-full border bg-surface-page shadow-sm uppercase tracking-wider",
+                                                    isCurrent ? "border-accent-info/30 text-accent-info" :
+                                                        isDone ? "border-accent-success/30 text-accent-success" : "border-border-default text-text-muted"
                                                 )}>
                                                     {cfg.statusText}
-                                                </span>
-                                            </div>
-                                        </motion.div>
+                                                </Typography>
 
-                                        {/* Item Card */}
-                                        <motion.div
-                                            className="flex-1 bg-surface-secondary rounded-b-lg border border-border-default border-t-0 p-5 shadow-card flex flex-col gap-5"
-                                            variants={slideUpItem(disableAnimation)}
-                                        >
-                                            {isCurrent && (
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex justify-between items-end mb-1">
-                                                        <span className="text-xs font-bold text-accent-info uppercase tracking-widest">Progress</span>
-                                                        <span className="text-sm font-bold text-text-primary">65%</span>
+                                                <Typography as="h3" variant="h2" className={cn("leading-tight mt-1 max-w-[200px]", isCurrent ? "text-text-primary" : "text-text-secondary")}>
+                                                    {step.label}
+                                                </Typography>
+
+                                                {step.badges && step.badges.length > 0 && (
+                                                    <div className="flex flex-wrap justify-center gap-1.5 mt-2 shrink-0">
+                                                        {step.badges.map((b, bi) => (
+                                                            <Typography key={bi} variant="caption" className="bg-surface-muted px-2 py-0.5 rounded text-text-secondary border border-border-default/50 font-semibold uppercase tracking-wider">
+                                                                {b}
+                                                            </Typography>
+                                                        ))}
                                                     </div>
-                                                    <div className="w-full h-2 bg-surface-muted rounded-full overflow-hidden mb-2">
-                                                        <motion.div
-                                                            className="h-full bg-accent-info rounded-full"
-                                                            initial={{ width: 0 }}
-                                                            animate={{ width: "65%" }}
-                                                            transition={{ duration: 1, delay: 0.5 }}
-                                                        />
-                                                    </div>
+                                                )}
+                                            </motion.div>
 
-                                                    {/* Elevated Blockers right under progress */}
-                                                    {step.blockers && step.blockers.length > 0 && (
-                                                        <motion.div className="flex flex-col gap-2 mt-2" variants={slideUpItem(disableAnimation)}>
-                                                            <span className="text-[10px] font-bold text-accent-danger uppercase tracking-widest">Attention Required</span>
-                                                            {step.blockers.map((bl, bli) => (
-                                                                <div key={bli} className="flex items-start gap-3 bg-accent-danger/5 p-4 rounded-md border border-accent-danger/20 shadow-sm">
-                                                                    <AlertTriangle className="w-5 h-5 text-accent-danger shrink-0 drop-shadow-sm" />
-                                                                    <span className="text-card-body font-semibold text-text-primary leading-snug">{bl}</span>
-                                                                </div>
-                                                            ))}
-                                                        </motion.div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {step.badges && step.badges.length > 0 && (
-                                                <motion.div className={cn(
-                                                    "flex flex-wrap gap-2",
-                                                    isCurrent && "mt-auto pt-4 border-t border-border-default/30"
-                                                )} variants={slideUpItem(disableAnimation)}>
-                                                    {step.badges.map((b, bi) => (
-                                                        <span key={bi} className="px-2.5 py-1 bg-surface-muted text-text-secondary text-xs font-bold rounded uppercase tracking-tight border border-border-default/50">
-                                                            {b}
-                                                        </span>
-                                                    ))}
-                                                </motion.div>
-                                            )}
-
-                                            {/* Fallback for non-current blockers */}
-                                            {!isCurrent && step.blockers && step.blockers.length > 0 && (
-                                                <motion.div className={cn(
-                                                    "flex flex-col gap-2",
-                                                    step.badges && step.badges.length > 0 && "pt-4 border-t border-border-default/30"
-                                                )} variants={slideUpItem(disableAnimation)}>
-                                                    <span className="text-[10px] font-bold text-accent-danger uppercase tracking-widest">Attention Required</span>
+                                            {/* Blockers below */}
+                                            {step.blockers && step.blockers.length > 0 && (
+                                                <motion.div className="w-full flex flex-col gap-2 mt-4 px-2 sm:px-4 max-w-[260px] mx-auto" variants={slideUpItem(disableAnimation)}>
                                                     {step.blockers.map((bl, bli) => (
-                                                        <div key={bli} className="flex items-start gap-2 bg-accent-danger/5 p-3 rounded border border-accent-danger/10">
-                                                            <AlertTriangle className="w-4 h-4 text-accent-danger shrink-0 mt-0.5" />
-                                                            <span className="text-xs font-medium text-text-primary leading-snug">{bl}</span>
+                                                        <div key={bli} className="w-full bg-surface-page border border-border-default rounded-lg p-3 shadow-sm flex items-start gap-2 relative overflow-hidden group hover:shadow-md transition-shadow">
+                                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent-danger" />
+                                                            <AlertTriangle className="w-4 h-4 text-accent-danger shrink-0 mt-0.5 ml-1" />
+                                                            <Typography variant="caption" className="text-text-primary font-medium line-clamp-2 text-left leading-snug">
+                                                                {bl}
+                                                            </Typography>
                                                         </div>
                                                     ))}
                                                 </motion.div>
                                             )}
-                                        </motion.div>
-                                    </motion.div>
-                                );
-                            })}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     ) : (
                         /* Strategy Linear Flow (Legacy style) */
@@ -233,12 +205,13 @@ export function PipelineSlide({ slide, disableAnimation = false }: { slide: Loos
                                                 <IconComponent className={cn("w-1/2 h-1/2", cfg.iconClass)} strokeWidth={status === "current" ? 2.5 : 2} />
                                             </div>
 
-                                            <span
+                                            <Typography
+                                                variant="h2"
                                                 className={cn("text-center leading-tight mt-2", cfg.labelClass)}
                                                 style={{ fontSize: "clamp(16px, 1.8vw, 24px)" }}
                                             >
                                                 {step.label}
-                                            </span>
+                                            </Typography>
 
                                             {!isLast && (
                                                 <div className="flex items-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-0 hidden">

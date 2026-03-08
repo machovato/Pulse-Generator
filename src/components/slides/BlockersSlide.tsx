@@ -6,6 +6,10 @@ import { staggerContainer, slideUpItem } from "@/lib/motion";
 import { LayoutSplit } from "./layouts/LayoutSplit";
 import type { LooseSlide } from "@/lib/schema";
 import { cn } from "@/lib/utils";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface BlockerItem {
     text: string;
@@ -19,23 +23,20 @@ interface BlockersData {
     items: BlockerItem[];
 }
 
-const SEVERITY_CONFIG = {
+const SEVERITY_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
     action: {
-        borderClass: "border-badge-action-bg border-l-accent",
-        badgeBg: "var(--badge-action-bg)",
-        badgeText: "var(--badge-action-text)",
+        bg: "var(--accent-danger)",
+        text: "#ffffff",
         label: "Action Required",
     },
     approval: {
-        borderClass: "border-badge-approval-bg border-l-accent",
-        badgeBg: "var(--badge-approval-bg)",
-        badgeText: "var(--badge-approval-text)",
+        bg: "var(--accent-warning)",
+        text: "#ffffff",
         label: "Approval",
     },
     fyi: {
-        borderClass: "border-badge-fyi-bg border-l-accent",
-        badgeBg: "var(--badge-fyi-bg)",
-        badgeText: "var(--badge-fyi-text)",
+        bg: "var(--text-muted)",
+        text: "#ffffff",
         label: "FYI",
     },
 };
@@ -60,15 +61,19 @@ export function BlockersSlide({ slide, deckMeta, disableAnimation = false }: { s
     const allClear = items.length === 0;
 
     const left = (
-        <motion.div className="flex flex-col h-full relative" variants={slideUpItem(disableAnimation)}>
+        <motion.div
+            className="flex flex-col h-full relative dark-surface"
+            variants={slideUpItem(disableAnimation)}
+        >
             <div className="flex flex-col gap-6 relative z-10 w-full pr-8">
                 <div className="flex flex-col gap-2">
-                    <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60 mb-1">
-                        Blockers
-                    </p>
-                    <h2
-                        className="font-bold text-text-on-emphasis leading-tight mt-0 mb-0 pt-0 text-slide-title"
-                        style={{ fontWeight: "var(--font-weight-title)" }}
+                    <Typography variant="eyebrow" className="text-accent-info mb-1">
+                        BLOCKERS
+                    </Typography>
+                    <Typography
+                        as="h2"
+                        variant="h1"
+                        className="text-text-on-emphasis leading-tight mt-0 mb-0 pt-0"
                     >
                         {panelTitle.split(' ').length > 2 ? panelTitle : (
                             <>
@@ -76,39 +81,42 @@ export function BlockersSlide({ slide, deckMeta, disableAnimation = false }: { s
                                 {panelTitle.split(' ').slice(1).join(' ')}
                             </>
                         )}
-                    </h2>
-                    <p className="text-text-on-emphasis opacity-90 text-slide-subtitle mt-4 leading-relaxed max-w-[90%]">
+                    </Typography>
+                    <Typography variant="subtitle" className="text-text-on-emphasis opacity-90 mt-4 leading-relaxed max-w-[90%]">
                         Current impediments requiring leadership attention or team coordination.
-                    </p>
+                    </Typography>
                 </div>
 
                 {!allClear && (
-                    <div className="flex flex-col gap-4 mt-8">
+                    <div className="flex flex-col gap-3 mt-8 max-w-sm">
                         {[
-                            { label: "Actions Required", count: actions, icon: AlertCircle },
-                            { label: "Approvals", count: approvals, icon: CheckSquare },
-                            { label: "FYIs", count: fyis, icon: Info },
-                        ].map(({ label, count, icon: Icon }) => (
+                            { label: "Actions Required", count: actions, icon: AlertCircle, colorClass: "text-accent-danger", borderClass: "border-accent-danger/50", bgClass: "bg-accent-danger/15" },
+                            { label: "Approvals", count: approvals, icon: CheckSquare, colorClass: "text-accent-warning", borderClass: "border-accent-warning/50", bgClass: "bg-accent-warning/15" },
+                            { label: "FYIs", count: fyis, icon: Info, colorClass: "text-text-muted", borderClass: "border-text-muted/50", bgClass: "bg-text-muted/15" },
+                        ].map(({ label, count, icon: Icon, colorClass, borderClass, bgClass }) => (
                             <div
                                 key={label}
-                                className="flex items-center justify-between rounded-xl px-5 py-6 bg-white/10"
-                                style={{
-                                    border: "1px solid rgba(255,255,255,0.15)"
-                                }}
+                                className={cn(
+                                    "flex items-center justify-between rounded-full px-5 py-2.5 border backdrop-blur-sm",
+                                    borderClass,
+                                    bgClass
+                                )}
                             >
-                                <div className="flex items-center gap-4">
-                                    <Icon className="w-5 h-5 text-text-on-emphasis" />
-                                    <span
-                                        className="font-semibold text-text-on-emphasis opacity-90 text-base"
+                                <div className="flex items-center gap-3">
+                                    <Icon className={cn("w-4 h-4", colorClass)} strokeWidth={2.5} />
+                                    <Typography
+                                        variant="caption"
+                                        className="font-bold uppercase tracking-wider text-white"
                                     >
                                         {label}
-                                    </span>
+                                    </Typography>
                                 </div>
-                                <span
-                                    className="font-bold text-text-on-emphasis text-2xl"
+                                <Typography
+                                    variant="body"
+                                    className="font-black text-white"
                                 >
                                     {count}
-                                </span>
+                                </Typography>
                             </div>
                         ))}
                     </div>
@@ -134,60 +142,60 @@ export function BlockersSlide({ slide, deckMeta, disableAnimation = false }: { s
                 {items.map((item, i) => {
                     const cfg = SEVERITY_CONFIG[item.severity] ?? SEVERITY_CONFIG.fyi;
                     return (
-                        <motion.div
+                        <MotionCard
                             key={i}
-                            className="bg-surface-secondary rounded-card shadow-card border border-border-default flex flex-col overflow-hidden"
-                            variants={staggerContainer(disableAnimation)}
+                            accent="none"
+                            className="flex flex-col w-full shadow-md transition-shadow hover:shadow-lg"
+                            style={{
+                                borderLeftWidth: "var(--border-width-accent)",
+                                borderLeftColor: cfg.bg,
+                            }}
+                            variants={slideUpItem(disableAnimation)}
                         >
-                            {/* Loud Priority Flag Header */}
-                            <motion.div
-                                className="w-full px-5 py-2.5 flex justify-between items-center border-b border-black/5"
-                                style={{
-                                    background: cfg.badgeBg,
-                                    color: cfg.badgeText,
-                                }}
-                            >
-                                <span className="font-extrabold uppercase tracking-widest text-[11px]">
+                            <div className="flex justify-between items-start w-full mb-3">
+                                <Typography
+                                    variant="badge"
+                                    className="px-3 py-1.5 rounded shadow-sm uppercase tracking-wider font-bold"
+                                    style={{ background: cfg.bg, color: cfg.text }}
+                                >
                                     {cfg.label}
-                                </span>
+                                </Typography>
+
                                 {item.severity === "action" && (
-                                    <div className="flex items-center gap-1.5 opacity-90">
-                                        <Clock className="w-3.5 h-3.5" strokeWidth={3} />
-                                        <span className="text-[10px] uppercase font-bold tracking-wider">High Priority</span>
+                                    <div className="flex items-center gap-1.5 opacity-90 text-accent-danger mt-1">
+                                        <Clock className="w-4 h-4" strokeWidth={3} />
+                                        <span className="text-[11px] uppercase font-bold tracking-wider text-text-primary">High Priority</span>
                                     </div>
                                 )}
-                            </motion.div>
+                            </div>
 
-                            {/* Card Body */}
-                            <motion.div className="p-5 flex flex-col gap-4" variants={slideUpItem(disableAnimation)}>
-                                <p
-                                    className="text-text-primary leading-snug text-card-title font-semibold"
-                                    style={{ fontWeight: "var(--font-weight-card-title)" }}
-                                >
-                                    {item.text}
-                                </p>
+                            <Typography
+                                variant="h2"
+                                className="text-text-primary leading-relaxed mt-1 flex-1"
+                            >
+                                {item.text}
+                            </Typography>
 
-                                <div className="flex justify-between items-center mt-2 pt-4 border-t border-border-default/50 min-h-[40px]">
-                                    {item.owner ? (
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-accent-info flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
-                                                {getInitials(item.owner)}
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-bold">Owner</span>
-                                                <span className="text-sm font-bold text-text-primary">{item.owner}</span>
-                                            </div>
+                            <div className="flex justify-between items-end mt-4 pt-4 border-t border-border-default/50 min-h-[40px]">
+                                {item.owner ? (
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-9 h-9 rounded-full bg-accent-info flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm">
+                                            {getInitials(item.owner)}
                                         </div>
-                                    ) : <div />}
-
-                                    {(item.severity === "fyi" || item.severity === "approval") && item.badges && item.badges.length > 0 && (
-                                        <div className="flex items-center gap-1.5 text-text-muted bg-surface-muted px-2.5 py-1 rounded shadow-inner border border-border-default/50">
-                                            <span className="text-[11px] font-bold uppercase tracking-wider">{item.badges.join(" · ")}</span>
+                                        <div className="flex flex-col justify-center">
+                                            <Typography variant="caption" className="uppercase tracking-[0.2em] font-bold opacity-60 text-[10px]">Owner</Typography>
+                                            <Typography variant="body" className="font-bold text-text-primary leading-none mt-0.5">{item.owner}</Typography>
                                         </div>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </motion.div>
+                                    </div>
+                                ) : <div />}
+
+                                {(item.severity === "fyi" || item.severity === "approval") && item.badges && item.badges.length > 0 && (
+                                    <div className="flex items-center gap-1.5 text-text-secondary bg-surface-muted px-3 py-1.5 rounded shadow-inner border border-border-default/50">
+                                        <Typography variant="badge">{item.badges.join(" · ")}</Typography>
+                                    </div>
+                                )}
+                            </div>
+                        </MotionCard>
                     );
                 })}
 

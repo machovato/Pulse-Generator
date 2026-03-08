@@ -8,6 +8,10 @@ import { LayoutSplit } from "./layouts/LayoutSplit";
 import type { LooseSlide } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { useTemplate } from "@/components/TemplateContext";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface Card {
     title: string;
@@ -19,42 +23,28 @@ interface GridData {
     cards: Card[];
 }
 
-function getIconColorMapping(iconName: string): { color: string, bgClass: string } {
-    const name = iconName.toLowerCase();
-    if (['table', 'database', 'grid'].includes(name)) return { color: "var(--accent-success)", bgClass: "bg-accent-success/10" };
-    if (['file-check', 'check-circle', 'shield-check'].includes(name)) return { color: "var(--accent-success)", bgClass: "bg-accent-success/10" };
-    if (['shield-alert', 'alert-triangle', 'shield'].includes(name)) return { color: "var(--accent-danger)", bgClass: "bg-accent-danger/10" };
-    if (['magnet', 'zap', 'trending-up'].includes(name)) return { color: "var(--accent-info)", bgClass: "bg-accent-info/10" };
-    if (['calendar', 'clock', 'timer'].includes(name)) return { color: "var(--accent-warning)", bgClass: "bg-accent-warning/10" };
-    return { color: "var(--accent-info)", bgClass: "bg-accent-info/10" };
-}
+function getIcon(name?: string, className?: string) {
+    if (!name) return <CircleDot className={className} strokeWidth={2.5} />;
 
-function getIcon(name?: string) {
-    if (!name) {
-        return {
-            element: <CircleDot className="w-5 h-5 text-accent-info" />,
-            theme: getIconColorMapping('default')
-        };
-    }
-
-    const mapping = getIconColorMapping(name);
     const key = name.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
 
     // @ts-expect-error - Dynamic lookup
     const IconComponent = LucideIcons[key] || LucideIcons[name.charAt(0).toUpperCase() + name.slice(1)];
 
-    if (!IconComponent) {
-        return {
-            element: <CircleDot className="w-5 h-5" style={{ color: mapping.color }} />,
-            theme: mapping
-        };
-    }
+    if (!IconComponent) return <CircleDot className={className} strokeWidth={2.5} />;
 
-    return {
-        element: <IconComponent className="w-5 h-5" style={{ color: mapping.color }} />,
-        theme: mapping
-    };
+    return <IconComponent className={className} strokeWidth={2.5} />;
 }
+
+const ACCENT_SEQUENCE = ["info", "success", "warning", "danger"] as const;
+type AccentType = typeof ACCENT_SEQUENCE[number];
+
+const ACCENT_CLASSES: Record<AccentType, { text: string; bg: string }> = {
+    info: { text: "text-accent-info", bg: "bg-accent-info/10" },
+    success: { text: "text-accent-success", bg: "bg-accent-success/10" },
+    warning: { text: "text-accent-warning", bg: "bg-accent-warning/10" },
+    danger: { text: "text-accent-danger", bg: "bg-accent-danger/10" }
+};
 
 export function GridSlide({ slide, disableAnimation = false }: { slide: LooseSlide, disableAnimation?: boolean }) {
     const { template } = useTemplate();
@@ -64,15 +54,14 @@ export function GridSlide({ slide, disableAnimation = false }: { slide: LooseSli
     const cols = isStrategy ? (cards.length <= 2 ? 1 : cards.length <= 4 ? 2 : 3) : 2;
 
     const left = (
-        <motion.div className="flex flex-col gap-4" variants={slideUpItem(disableAnimation)}>
-
-            <h2
-                className="font-bold text-text-on-emphasis text-slide-title leading-tight"
-                style={{ fontWeight: "var(--font-weight-title)" }}
-            >
+        <motion.div
+            className="flex flex-col gap-4 dark-surface"
+            variants={slideUpItem(disableAnimation)}
+        >
+            <Typography variant="h1" className="leading-tight mt-0 mb-0 pt-0">
                 {slide.title}
-            </h2>
-            <div className="w-8 h-0.5 bg-text-on-emphasis opacity-30 mt-2" />
+            </Typography>
+            <div className="w-8 h-0.5 bg-white opacity-30 mt-2" />
         </motion.div>
     );
 
@@ -86,43 +75,35 @@ export function GridSlide({ slide, disableAnimation = false }: { slide: LooseSli
             }}
         >
             {cards.map((card, i) => {
-                const iconData = getIcon(card.icon);
+                const accent = !isStrategy ? ACCENT_SEQUENCE[i % ACCENT_SEQUENCE.length] : "none";
+                const classes = !isStrategy ? ACCENT_CLASSES[accent as AccentType] : { text: "text-text-muted", bg: "bg-surface-muted border border-border-default/50" };
+
                 return (
-                    <motion.div
+                    <MotionCard
                         key={i}
-                        className="bg-surface-secondary p-card flex flex-col justify-center h-full border-card shadow-card hover:shadow-xl hover:border-border-strong transition-all duration-200 ease-out hover:scale-[1.02] rounded-card @container"
-                        style={{ borderWidth: "var(--border-width-card)" }}
+                        accent={accent}
+                        className="flex flex-col justify-center text-center items-center p-8 h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out"
                         variants={slideUpItem(disableAnimation)}
                     >
                         <div
                             className={cn(
-                                "flex items-center justify-center mb-4 shrink-0 border border-border-default/50",
-                                isStrategy ? iconData.theme.bgClass : "bg-surface-muted"
+                                "flex items-center justify-center mb-5 shrink-0 rounded-full",
+                                classes.bg
                             )}
                             style={{
-                                width: "clamp(32px, 10cqi, 48px)",
-                                height: "clamp(32px, 10cqi, 48px)",
-                                borderRadius: isStrategy ? "calc(var(--border-radius-card) * 0.6)" : "var(--border-radius-badge)"
+                                width: "clamp(48px, 12cqi, 64px)",
+                                height: "clamp(48px, 12cqi, 64px)",
                             }}
                         >
-                            {!isStrategy ? (
-                                <div className="text-text-muted">
-                                    {iconData.element}
-                                </div>
-                            ) : iconData.element}
+                            {getIcon(card.icon, cn("w-7 h-7", classes.text))}
                         </div>
-                        <p
-                            className="font-bold text-text-primary text-card-title mb-2 leading-tight drop-shadow-sm"
-                            style={{ fontWeight: "var(--font-weight-card-title)" }}
-                        >
+                        <Typography variant="h2" className="mb-3 leading-tight drop-shadow-sm font-bold">
                             {card.title}
-                        </p>
-                        <p
-                            className="text-text-secondary text-card-body leading-relaxed"
-                        >
+                        </Typography>
+                        <Typography variant="body" className="leading-relaxed opacity-90 max-w-[280px]">
                             {card.body}
-                        </p>
-                    </motion.div>
+                        </Typography>
+                    </MotionCard>
                 );
             })}
         </div>

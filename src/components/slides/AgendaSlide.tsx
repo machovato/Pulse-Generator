@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { staggerContainer, slideUpItem } from "@/lib/motion";
 import { LayoutSplit } from "./layouts/LayoutSplit";
 import type { LooseSlide } from "@/lib/schema";
+import { Typography } from "../ui/Typography";
 
 interface AgendaItem {
     topic: string;
@@ -20,21 +21,21 @@ export function AgendaSlide({ slide, disableAnimation = false }: { slide: LooseS
     const items = data.items ?? [];
 
     const left = (
-        <motion.div className="flex flex-col gap-4" variants={slideUpItem(disableAnimation)}>
-            <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60">
+        <motion.div
+            className="flex flex-col gap-4 dark-surface"
+            variants={slideUpItem(disableAnimation)}
+        >
+            <Typography variant="eyebrow" className="text-text-on-emphasis mb-1">
                 Agenda
-            </p>
-            <h2
-                className="font-bold text-text-on-emphasis leading-tight"
-                style={{ fontSize: "clamp(28px, 3.2vw, 44px)" }}
-            >
+            </Typography>
+            <Typography as="h2" variant="h1" className="leading-tight mt-0 mb-0 pt-0">
                 {slide.title}
-            </h2>
-            <div className="w-8 h-0.5 bg-text-on-emphasis opacity-30 mt-2" />
+            </Typography>
+            <div className="w-8 h-0.5 bg-white opacity-30 mt-2" />
             {items.length > 0 && (
-                <p className="text-text-on-emphasis opacity-50 text-sm mt-1">
+                <Typography variant="caption" className="opacity-70 mt-1">
                     {items.length} item{items.length !== 1 ? "s" : ""}
-                </p>
+                </Typography>
             )}
         </motion.div>
     );
@@ -70,31 +71,22 @@ export function AgendaSlide({ slide, disableAnimation = false }: { slide: LooseS
 
                     {/* Topic + meta */}
                     <div className="flex-1 min-w-0">
-                        <p
-                            className="font-bold text-text-primary leading-tight"
-                            style={{ fontSize: "clamp(16px, 3.2cqi, 28px)" }}
-                        >
+                        <Typography variant="h2" className="leading-tight">
                             {item.topic}
-                        </p>
+                        </Typography>
                         <div className="flex gap-4 mt-2 flex-wrap items-center">
                             {item.time && (
-                                <span
-                                    className="text-accent-info font-bold bg-surface-muted border border-border-default rounded"
-                                    style={{
-                                        fontSize: "clamp(11px, 1.8cqi, 16px)",
-                                        padding: "clamp(2px, 0.4cqi, 4px) clamp(6px, 1cqi, 12px)"
-                                    }}
+                                <Typography
+                                    variant="badge"
+                                    className="text-accent-info bg-surface-muted px-2 py-0.5 rounded border border-border-default/50"
                                 >
                                     {item.time}
-                                </span>
+                                </Typography>
                             )}
                             {item.owner && (
-                                <span
-                                    className="text-text-secondary font-semibold"
-                                    style={{ fontSize: "clamp(12px, 1.8cqi, 16px)" }}
-                                >
+                                <Typography variant="caption" className="font-semibold">
                                     {item.owner}
-                                </span>
+                                </Typography>
                             )}
                         </div>
                     </div>

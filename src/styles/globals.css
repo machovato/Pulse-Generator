@@ -160,6 +160,17 @@ body {
   color: var(--dtn-blue);
 }
 
+/* ─── Surface Overrides ─────────────────────────────────────────────────── */
+.dark-surface {
+  color: #ffffff; /* Forces CSS inheritance downwards for Typography base elements */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --color-text-body: rgba(255, 255, 255, 0.9);
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+  --color-text-heading: #ffffff;
+}
+
 /* ─── Card base ─────────────────────────────────────────────────────────── */
 .card {
   background: var(--color-surface-card);

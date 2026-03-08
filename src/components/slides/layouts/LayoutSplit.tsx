@@ -35,7 +35,7 @@ export function LayoutSplit({
         <div className="relative w-full h-full flex overflow-hidden">
             {/* LEFT PANEL — 40% */}
             <div
-                className="relative flex flex-col justify-center px-10 overflow-hidden"
+                className="relative flex flex-col justify-center px-10 overflow-hidden dark-surface"
                 style={{
                     width: "40%",
                     flexShrink: 0,

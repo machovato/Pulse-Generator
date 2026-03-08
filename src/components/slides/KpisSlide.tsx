@@ -5,6 +5,10 @@ import * as LucideIcons from "lucide-react";
 import { staggerContainer, slideUpItem } from "@/lib/motion";
 import { LayoutWhite } from "./layouts/LayoutWhite";
 import type { LooseSlide } from "@/lib/schema";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface KPIItem {
     label: string;
@@ -22,10 +26,10 @@ interface KpisData {
 // up   = DTN Accent Lime #8DC63F  — positive performance indicator
 // down = DTN Red         #C8192B  — negative, attention needed
 // flat = DTN Neutral Mid #BCBEC0  — no significant change
-const TREND_CONFIG = {
-    up: { borderClass: "border-t-[6px] border-t-accent-success", iconClass: "text-accent-success", icon: LucideIcons.TrendingUp },
-    down: { borderClass: "border-t-[6px] border-t-accent-danger", iconClass: "text-accent-danger", icon: LucideIcons.TrendingDown },
-    flat: { borderClass: "border-t-[6px] border-t-border-muted", iconClass: "text-border-muted", icon: LucideIcons.Minus }
+const TREND_CONFIG: Record<string, { iconClass: string; icon: any; accent: "success" | "danger" | "neutral" }> = {
+    up: { iconClass: "text-accent-success", icon: LucideIcons.TrendingUp, accent: "success" },
+    down: { iconClass: "text-accent-danger", icon: LucideIcons.TrendingDown, accent: "danger" },
+    flat: { iconClass: "text-border-muted", icon: LucideIcons.Minus, accent: "neutral" }
 };
 
 function getIcon(name?: string) {
@@ -50,25 +54,23 @@ export function KpisSlide({ slide, disableAnimation = false }: { slide: LooseSli
         >
             <LayoutWhite center={true}>
                 {/* Slide title & eyebrow */}
-                <div className="w-full text-center mt-6 mb-10 flex flex-col items-center">
-                    <motion.p
-                        className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info mb-4"
-                        variants={slideUpItem(disableAnimation)}
-                    >
-                        Project Status
-                    </motion.p>
-                    <motion.h1
-                        className="text-slide-title font-bold text-text-primary mt-0"
-                        variants={slideUpItem(disableAnimation)}
-                    >
-                        {slide.title}
-                    </motion.h1>
+                <div className="w-full text-center mt-6 mb-4 flex flex-col items-center shrink-0">
+                    <motion.div variants={slideUpItem(disableAnimation)}>
+                        <Typography variant="eyebrow" className="mb-2 text-accent-info">
+                            Project Status
+                        </Typography>
+                    </motion.div>
+                    <motion.div variants={slideUpItem(disableAnimation)}>
+                        <Typography as="h1" variant="h1" className="mt-0">
+                            {slide.title}
+                        </Typography>
+                    </motion.div>
                 </div>
 
                 {/* KPI scoreboard — dashboard widget panel grid */}
-                <div className="flex-1 flex items-center justify-center w-full px-slide pb-slide">
+                <div className="flex-1 flex items-stretch w-full px-slide pb-slide pt-4">
                     <div
-                        className="grid gap-card w-full max-w-6xl mx-auto"
+                        className="grid gap-card w-full max-w-7xl mx-auto items-stretch h-full"
                         style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
                     >
                         {items.map((kpi, i) => {
@@ -77,58 +79,65 @@ export function KpisSlide({ slide, disableAnimation = false }: { slide: LooseSli
                             const TrendIcon = trendCfg.icon;
 
                             return (
-                                <motion.div
+                                <MotionCard
                                     key={i}
-                                    className={`flex flex-col items-center text-center gap-3 bg-surface-secondary rounded-card shadow-card ${trendCfg.borderClass} border-x border-b border-x-border-default border-b-border-default`}
-                                    style={{ padding: "var(--spacing-card-padding)" }}
+                                    accent={trendCfg.accent}
+                                    className="flex flex-col text-center transition-all h-full"
                                     variants={slideUpItem(disableAnimation)}
                                 >
-                                    {/* Icon & Label */}
-                                    <div className="flex items-center gap-3 mb-1">
+                                    {/* Label at Top */}
+                                    <div className="flex flex-col items-center gap-2 mb-auto shrink-0 pt-2">
                                         {kpi.icon && (
-                                            <div className="w-8 h-8 rounded-lg bg-surface-muted flex items-center justify-center">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center shrink-0">
                                                 {getIcon(kpi.icon)}
                                             </div>
                                         )}
-                                        <span className="text-metric-unit font-semibold uppercase tracking-widest text-text-secondary">
+                                        <Typography variant="caption" className="font-bold tracking-wider text-text-secondary uppercase">
                                             {kpi.label}
-                                        </span>
+                                        </Typography>
                                     </div>
 
-                                    {/* Value — scoreboard */}
-                                    <div className="flex items-center justify-center gap-3">
-                                        <span
-                                            className="font-bold text-text-primary whitespace-nowrap text-metric-lg"
-                                            style={{ lineHeight: 1 }}
-                                        >
-                                            {kpi.value}
-                                        </span>
-                                        {TrendIcon && (
-                                            <TrendIcon className={`w-10 h-10 ${trendCfg.iconClass}`} strokeWidth={3.5} />
+                                    {/* Metric Center */}
+                                    <div className="flex flex-col items-center justify-center py-6 my-auto">
+                                        <div className="flex items-center justify-center gap-3">
+                                            <Typography
+                                                variant="metric"
+                                                className="whitespace-nowrap tracking-tight drop-shadow-sm"
+                                                style={{ lineHeight: 1 }}
+                                            >
+                                                {kpi.value}
+                                            </Typography>
+                                            {TrendIcon && (
+                                                <TrendIcon className={`w-8 h-8 sm:w-10 sm:h-10 shrink-0 ${trendCfg.iconClass}`} strokeWidth={3.5} />
+                                            )}
+                                        </div>
+
+                                        {/* Fraction Progress Bar */}
+                                        {(() => {
+                                            const match = kpi.value.match(/^(\d+(?:\.\d+)?)\s*(?:of|\/)\s*(\d+(?:\.\d+)?)$/i);
+                                            if (match) {
+                                                const num = parseFloat(match[1]);
+                                                const den = parseFloat(match[2]);
+                                                const pct = den > 0 ? Math.min(100, Math.max(0, (num / den) * 100)) : 0;
+                                                return (
+                                                    <div className="w-full max-w-xs h-1.5 mt-4 bg-surface-muted border border-border-default/50 rounded-full overflow-hidden shadow-inner">
+                                                        <div className="h-full bg-accent-progress rounded-full transition-all duration-500 ease-out" style={{ width: `${pct}%` }} />
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                    </div>
+
+                                    {/* Description/Note Bottom */}
+                                    <div className="mt-auto shrink-0 pb-2">
+                                        {kpi.note && (
+                                            <Typography variant="body" className="text-text-muted">
+                                                {kpi.note}
+                                            </Typography>
                                         )}
                                     </div>
-
-                                    {/* Fraction Progress Bar */}
-                                    {(() => {
-                                        const match = kpi.value.match(/^(\d+(?:\.\d+)?)\s*(?:of|\/)\s*(\d+(?:\.\d+)?)$/i);
-                                        if (match) {
-                                            const num = parseFloat(match[1]);
-                                            const den = parseFloat(match[2]);
-                                            const pct = den > 0 ? Math.min(100, Math.max(0, (num / den) * 100)) : 0;
-                                            return (
-                                                <div className="w-full h-1.5 mt-0.5 mb-1 bg-surface-muted border border-border-default/50 rounded-full overflow-hidden shadow-inner">
-                                                    <div className="h-full bg-accent-progress rounded-full transition-all duration-500 ease-out" style={{ width: `${pct}%` }} />
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
-
-                                    {/* Note */}
-                                    {kpi.note && (
-                                        <span className="text-caption text-text-muted mt-1">{kpi.note}</span>
-                                    )}
-                                </motion.div>
+                                </MotionCard>
                             );
                         })}
                     </div>

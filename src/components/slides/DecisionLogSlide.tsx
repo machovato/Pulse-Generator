@@ -5,6 +5,10 @@ import { staggerContainer, slideUpItem } from "@/lib/motion";
 import { LayoutSplit } from "./layouts/LayoutSplit";
 import type { LooseSlide } from "@/lib/schema";
 import { cn } from "@/lib/utils";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface DecisionItem {
     decision: string;
@@ -22,10 +26,10 @@ interface DecisionLogData {
 // proposed   = DTN Teal        #007074 — pending decision, informational
 // done       = DTN Dark Green  #005741 — archived/complete (historical)
 const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string; label: string }> = {
-    proposed: { bg: "var(--surface-muted)", text: "var(--text-primary)", border: "var(--border-muted)", label: "Proposed" },
-    approved: { bg: "var(--surface-secondary)", text: "var(--accent-success)", border: "var(--accent-success)", label: "Approved" },
-    blocked: { bg: "var(--badge-action-bg)", text: "var(--badge-action-text)", border: "var(--accent-danger)", label: "Blocked" },
-    done: { bg: "var(--surface-muted)", text: "var(--text-muted)", border: "var(--border-muted)", label: "Done" },
+    proposed: { bg: "var(--surface-muted)", text: "var(--text-secondary)", border: "var(--border-muted)", label: "Proposed" },
+    approved: { bg: "var(--accent-success)", text: "#ffffff", border: "var(--accent-success)", label: "Approved" },
+    blocked: { bg: "var(--accent-danger)", text: "#ffffff", border: "var(--accent-danger)", label: "Blocked" },
+    done: { bg: "var(--text-muted)", text: "#ffffff", border: "var(--text-muted)", label: "Done" },
 };
 
 export function DecisionLogSlide({ slide, disableAnimation = false }: { slide: LooseSlide, disableAnimation?: boolean }) {
@@ -33,88 +37,98 @@ export function DecisionLogSlide({ slide, disableAnimation = false }: { slide: L
     const items = data.items ?? [];
 
     const left = (
-        <motion.div className="flex flex-col gap-4" variants={slideUpItem(disableAnimation)}>
-            <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60">
+        <motion.div
+            className="flex flex-col gap-4 dark-surface"
+            variants={slideUpItem(disableAnimation)}
+        >
+            <Typography variant="eyebrow" className="text-text-on-emphasis opacity-60">
                 Decision Log
-            </p>
-            <h2
-                className="font-bold text-text-on-emphasis leading-tight"
-                style={{ fontSize: "clamp(24px, 3vw, 40px)" }}
-            >
+            </Typography>
+            <Typography as="h2" variant="h1" className="leading-tight mt-0 pt-0 mb-0">
                 {slide.title}
-            </h2>
-            <div className="w-8 h-0.5 bg-text-on-emphasis opacity-30 mt-2" />
-            <p className="text-text-on-emphasis opacity-55 text-xs mt-1">
+            </Typography>
+            <div className="w-8 h-0.5 bg-white opacity-30 mt-2" />
+            <Typography variant="caption" className="opacity-55 mt-1">
                 {items.length} decision{items.length !== 1 ? "s" : ""} recorded
-            </p>
+            </Typography>
         </motion.div>
     );
 
     const right = (
-        <div className="w-full h-full flex flex-col justify-center">
-            <motion.div
-                className="w-full bg-surface-muted rounded-card border border-border-default shadow-sm overflow-hidden flex flex-col h-full max-h-[600px]"
+        <div className="w-full h-full flex flex-col justify-center items-start overflow-hidden">
+            <MotionCard
+                accent="none"
+                className="w-full overflow-hidden flex flex-col max-h-[600px] p-0 shadow-lg border border-border-default/50"
+                style={{ padding: 0 }}
                 variants={staggerContainer(disableAnimation)}
             >
-                <div className="px-8 py-6 flex-1 overflow-y-auto w-full">
-                    {/* Header row - Ledger Style */}
-                    <motion.div className="grid grid-cols-[1fr_2fr_1.5fr_1.5fr] gap-6 pb-4 border-b-2 border-border-default mb-2" variants={slideUpItem(disableAnimation)}>
+                <div className="flex flex-col w-full h-full overflow-hidden">
+                    {/* Header row - DTN Gradient Style */}
+                    <motion.div className="sticky top-0 z-10 grid grid-cols-[2.5fr_1fr_1fr_1fr] gap-6 px-8 py-3.5 bg-gradient-to-r from-[#1497E3] to-[#007074] border-b border-[#0F2942]/20 shadow-md" variants={slideUpItem(disableAnimation)}>
                         {["Decision", "Owner", "Date", "Status"].map((h) => (
-                            <div
+                            <Typography
                                 key={h}
+                                variant="caption"
                                 className={cn(
-                                    "font-bold uppercase tracking-[0.15em] text-text-muted text-[11px]",
+                                    "font-bold uppercase tracking-[0.1em] text-white",
                                     h === "Status" && "text-right"
                                 )}
+                                style={{ color: "#ffffff" }}
                             >
                                 {h}
-                            </div>
+                            </Typography>
                         ))}
                     </motion.div>
 
                     {/* Rows */}
-                    <div className="flex flex-col w-full">
+                    <div className="flex flex-col w-full overflow-y-auto pb-4">
                         {items.map((item, i) => {
                             const cfg = STATUS_CONFIG[item.status ?? "proposed"];
                             return (
                                 <motion.div
                                     key={i}
-                                    className="grid grid-cols-[1fr_2fr_1.5fr_1.5fr] gap-6 py-5 border-b border-border-default/40 last:border-0 items-center w-full group hover:bg-black/[0.02] transition-colors px-2 -mx-2 rounded"
+                                    className="relative grid grid-cols-[2.5fr_1fr_1fr_1fr] gap-6 py-4 px-8 border-b border-border-default/50 last:border-b-0 items-center w-full group hover:bg-black/[0.02] transition-colors overflow-hidden"
                                     variants={slideUpItem(disableAnimation)}
                                 >
-                                    <p
-                                        className="text-text-primary font-bold leading-snug text-sm max-w-[280px]"
+                                    {/* Left Status Border */}
+                                    <div className="absolute left-0 top-0 bottom-0 w-1.5 opacity-80" style={{ backgroundColor: cfg.border }} />
+
+                                    <Typography
+                                        variant="body"
+                                        className="leading-snug font-semibold text-text-primary pr-4"
                                     >
                                         {item.decision}
-                                    </p>
-                                    <span
-                                        className="text-text-secondary whitespace-nowrap text-sm font-medium"
+                                    </Typography>
+                                    <Typography
+                                        variant="body"
+                                        className="whitespace-nowrap"
                                     >
                                         {item.owner ?? "—"}
-                                    </span>
-                                    <span
-                                        className="text-text-muted whitespace-nowrap text-sm font-medium"
+                                    </Typography>
+                                    <Typography
+                                        variant="body"
+                                        className="text-text-muted whitespace-nowrap"
                                     >
                                         {item.date ?? "—"}
-                                    </span>
+                                    </Typography>
                                     <div className="flex justify-end w-full">
-                                        <span
-                                            className="font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-sm whitespace-nowrap border-2 text-[10px] shadow-sm transform group-hover:-translate-y-0.5 transition-transform"
+                                        <Typography
+                                            variant="badge"
+                                            className="px-3 py-1.5 rounded whitespace-nowrap shadow-sm border border-black/10 transition-transform font-bold tracking-wide"
                                             style={{
                                                 background: cfg.bg,
                                                 color: cfg.text,
-                                                borderColor: cfg.border,
                                             }}
                                         >
                                             {cfg.label}
-                                        </span>
+                                        </Typography>
                                     </div>
                                 </motion.div>
                             );
                         })}
                     </div>
                 </div>
-            </motion.div>
+            </MotionCard>
         </div>
     );
 

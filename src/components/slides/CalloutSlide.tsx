@@ -7,6 +7,10 @@ import { LayoutWhite } from "./layouts/LayoutWhite";
 import type { LooseSlide } from "@/lib/schema";
 import { useTemplate } from "@/components/TemplateContext";
 import { cn } from "@/lib/utils";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface CalloutData {
     text: string;
@@ -47,16 +51,22 @@ export function CalloutSlide({ slide, disableAnimation = false }: { slide: Loose
     const isStrategy = template === "strategy";
 
     const left = (
-        <motion.div className="flex flex-col gap-4" variants={slideUpItem(disableAnimation)}>
-            <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60">
+        <motion.div
+            className="flex flex-col gap-4"
+            variants={slideUpItem(disableAnimation)}
+            style={{
+                "--text-primary": "#ffffff",
+                "--text-secondary": "rgba(255, 255, 255, 0.9)",
+                "--text-muted": "rgba(255, 255, 255, 0.6)"
+            } as React.CSSProperties}
+        >
+            <Typography variant="eyebrow" className="text-accent-info opacity-60">
                 {LEFT_EYEBROW[kind]}
-            </p>
-            <h2
-                className="font-bold text-text-on-emphasis leading-tight text-slide-subtitle"
-            >
+            </Typography>
+            <Typography as="h2" variant="subtitle" className="leading-tight mt-0 pt-0">
                 {slide.title}
-            </h2>
-            <div className="w-8 h-0.5 bg-text-on-emphasis opacity-30 mt-3" />
+            </Typography>
+            <div className="w-8 h-0.5 bg-white opacity-30 mt-3" />
         </motion.div>
     );
 
@@ -73,25 +83,25 @@ export function CalloutSlide({ slide, disableAnimation = false }: { slide: Loose
             )}
 
             <div className={cn(isQuote ? "pl-0" : "pl-8")}>
-                <motion.p
+                <Typography
+                    as="p"
+                    variant="h1"
                     className={cn(
-                        "text-text-primary leading-snug",
+                        "leading-snug",
                         isQuote ? "italic font-bold" : "font-extrabold"
                     )}
-                    style={{ fontSize: isQuote ? "var(--type-headline)" : "var(--type-headline)" }}
-                    variants={slideUpItem(disableAnimation)}
                 >
                     {data.text}
-                </motion.p>
+                </Typography>
             </div>
 
             {data.attribution && (
-                <motion.p
-                    className="text-caption text-text-secondary font-bold pl-8 mt-2 uppercase tracking-widest"
-                    variants={slideUpItem(disableAnimation)}
+                <Typography
+                    variant="caption"
+                    className="pl-8 mt-2"
                 >
                     — {data.attribution}
-                </motion.p>
+                </Typography>
             )}
         </motion.div>
     );
@@ -100,7 +110,12 @@ export function CalloutSlide({ slide, disableAnimation = false }: { slide: Loose
         return (
             <motion.div className="w-full h-full" variants={staggerContainer(disableAnimation)} initial="hidden" animate="visible">
                 <LayoutWhite center={true}>
-                    <motion.div className="max-w-4xl w-full mx-auto p-12 bg-surface-secondary border border-border-default rounded-card shadow-lg relative overflow-hidden" variants={scaleInItem(disableAnimation)}>
+                    <MotionCard
+                        accent="none"
+                        className="max-w-4xl w-full mx-auto shadow-lg relative overflow-hidden"
+                        style={{ padding: "48px" }}
+                        variants={scaleInItem(disableAnimation)}
+                    >
                         <div className={cn("absolute top-0 left-0 bottom-0 w-2",
                             kind === "decision" ? "bg-accent-info" :
                                 kind === "risk" ? "bg-accent-danger" :
@@ -108,14 +123,16 @@ export function CalloutSlide({ slide, disableAnimation = false }: { slide: Loose
                         )} />
                         <div className="flex flex-col gap-6">
                             <div className="flex items-center justify-between border-b border-border-default/50 pb-4">
-                                <span className="text-badge font-bold uppercase tracking-widest text-text-secondary opacity-60">
+                                <Typography variant="badge" className="text-text-secondary opacity-60">
                                     {LEFT_EYEBROW[kind]}
-                                </span>
-                                <span className="text-caption font-semibold text-text-primary">{slide.title}</span>
+                                </Typography>
+                                <Typography variant="caption" className="font-semibold text-text-primary">
+                                    {slide.title}
+                                </Typography>
                             </div>
                             {right}
                         </div>
-                    </motion.div>
+                    </MotionCard>
                 </LayoutWhite>
             </motion.div>
         );

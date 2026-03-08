@@ -8,6 +8,7 @@ import { LayoutWhite } from "./layouts/LayoutWhite";
 import type { LooseSlide } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { useTemplate } from "@/components/TemplateContext";
+import { Typography } from "../ui/Typography";
 
 interface FrameworkLane {
     title: string;
@@ -42,20 +43,20 @@ export function FrameworkSlide({ slide, disableAnimation = false }: { slide: Loo
     return (
         <motion.div className="w-full h-full" variants={staggerContainer(disableAnimation)} initial="hidden" animate="visible">
             <LayoutWhite center={false}>
-                <div className="w-full flex-1 flex flex-col justify-center py-12">
-                    <motion.div className="mb-12 shrink-0" variants={slideUpItem(disableAnimation)}>
-                        <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60 mb-2">
+                <div className="w-full flex-1 flex flex-col pt-0 pb-6">
+                    <motion.div className="mb-2 shrink-0" variants={slideUpItem(disableAnimation)}>
+                        <Typography variant="eyebrow" className="text-accent-info opacity-60 mb-1">
                             Framework
-                        </p>
-                        <h2
-                            className="font-bold text-text-primary leading-tight"
-                            style={{ fontSize: "clamp(32px, 4vw, 56px)" }}
+                        </Typography>
+                        <Typography
+                            as="h2"
+                            variant="h1"
                         >
                             {slide.title}
-                        </h2>
+                        </Typography>
                     </motion.div>
 
-                    <div className="flex flex-col gap-5 flex-1 w-full max-w-6xl mx-auto justify-center">
+                    <div className="flex flex-col gap-4 w-full max-w-6xl mx-auto my-auto justify-center">
                         {sortedLanes.map((lane, i) => {
                             let fillProps = "";
                             let borderProps = "";
@@ -63,20 +64,20 @@ export function FrameworkSlide({ slide, disableAnimation = false }: { slide: Loo
                             let opacityProps = 1;
 
                             if (lane.type === "control") {
-                                fillProps = "bg-surface-primary text-text-on-emphasis";
-                                borderProps = "border-[4px] border-surface-primary shadow-xl";
+                                fillProps = "bg-[#0F2942]/[0.05] text-[#0F2942]";
+                                borderProps = "border-[4px] border-[#0F2942] shadow-md";
                                 widthProps = "w-full";
                                 opacityProps = 1;
                             } else if (lane.type === "influence") {
-                                fillProps = "bg-surface-secondary text-text-primary";
-                                borderProps = cn("border-[4px] shadow-lg", isStrategy ? "border-dashed border-accent-info" : "border-solid border-border-default");
-                                widthProps = "w-[92%] mx-auto";
-                                opacityProps = 1;
+                                fillProps = "bg-[#007074]/5 text-[#007074]";
+                                borderProps = cn("border-[3px] shadow-[0_4px_12px_rgba(0,112,116,0.08)]", isStrategy ? "border-dashed border-[#007074]/70" : "border-solid border-[#007074]");
+                                widthProps = "w-[90%] mx-auto";
+                                opacityProps = 0.95;
                             } else if (lane.type === "concern") {
                                 fillProps = "bg-surface-page text-text-secondary";
-                                borderProps = cn("border-[4px] shadow-md", isStrategy ? "border-dotted border-border-muted" : "border-solid border-border-muted");
-                                widthProps = "w-[84%] mx-auto";
-                                opacityProps = 1;
+                                borderProps = cn("border-[2px]", isStrategy ? "border-dotted border-border-muted" : "border-solid border-border-muted");
+                                widthProps = "w-[80%] mx-auto";
+                                opacityProps = 0.9;
                             }
 
                             // Animate down one by one
@@ -85,27 +86,27 @@ export function FrameworkSlide({ slide, disableAnimation = false }: { slide: Loo
                             return (
                                 <motion.div
                                     key={i}
-                                    className={`flex flex-col md:flex-row items-start md:items-center gap-6 p-6 md:px-10 md:py-8 rounded-2xl ${fillProps} ${borderProps} ${widthProps} shadow-sm`}
-                                    style={{ opacity: opacityProps }}
+                                    className={`flex flex-col md:flex-row items-start md:items-center gap-6 p-4 md:px-8 md:py-6 rounded-2xl ${fillProps} ${borderProps} ${widthProps} transition-opacity duration-300`}
+                                    style={{
+                                        opacity: opacityProps,
+                                    }}
                                     variants={slideUpItem(disableAnimation)}
                                 >
-                                    <div className="shrink-0 flex flex-col items-center md:items-start md:w-48">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className={lane.type === 'control' ? 'text-text-on-emphasis' : 'text-accent-info'}>
-                                                {getLucideIcon(lane.icon, "w-10 h-10")}
-                                            </div>
+                                    <div className="shrink-0 flex flex-row items-center gap-4 md:w-56">
+                                        <div className={lane.type === 'control' ? 'text-[#0F2942]' : lane.type === 'influence' ? 'text-[#007074]' : 'text-text-muted'}>
+                                            {getLucideIcon(lane.icon, "w-8 h-8 sm:w-10 sm:h-10")}
                                         </div>
-                                        <div className={`px-3 py-1.5 text-sm font-bold uppercase tracking-[0.15em] rounded-md inline-block shadow-sm ${lane.type === 'control' ? 'bg-surface-page text-text-primary' : 'bg-surface-muted text-text-primary border border-border-default/80'}`}>
+                                        <Typography variant="badge" className={`px-3 py-1.5 rounded-md inline-flex shadow-sm uppercase tracking-wider font-bold ${lane.type === 'control' ? 'bg-[#0F2942] text-white border-transparent' : lane.type === 'influence' ? 'bg-[#007074]/10 text-[#007074] border border-[#007074]/20' : 'bg-surface-muted text-text-primary border border-border-default/80'}`}>
                                             {lane.type}
-                                        </div>
+                                        </Typography>
                                     </div>
-                                    <div className="flex-1 border-l-[6px] pl-6 md:pl-10 border-border-default/50 rounded-l-[4px]">
-                                        <h3 className={`text-2xl md:text-[32px] font-bold mb-3 ${lane.type === 'control' ? 'text-text-on-emphasis' : 'text-text-primary'}`}>
+                                    <div className={cn("flex-1 border-l-4 pl-6 md:pl-8 rounded-l-sm py-1", lane.type === 'control' ? 'border-[#0F2942]/20' : lane.type === 'influence' ? 'border-[#007074]/20' : 'border-border-default/40')}>
+                                        <Typography as="h3" variant="h2" className={cn("mb-1 leading-tight", lane.type === 'control' ? 'text-[#0F2942] font-black' : lane.type === 'influence' ? 'text-[#007074] font-bold' : 'text-text-primary mb-1')}>
                                             {lane.title}
-                                        </h3>
-                                        <p className={`text-lg md:text-xl font-medium leading-relaxed ${lane.type === 'control' ? 'text-text-on-emphasis opacity-90' : 'text-text-secondary'}`}>
+                                        </Typography>
+                                        <Typography as="p" variant="body" className={cn("leading-relaxed max-w-4xl", lane.type === 'concern' ? 'text-text-secondary' : 'text-text-primary/90 leading-relaxed font-medium')}>
                                             {lane.body}
-                                        </p>
+                                        </Typography>
                                     </div>
                                 </motion.div>
                             );

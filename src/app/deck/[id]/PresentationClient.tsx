@@ -100,7 +100,7 @@ function SlideGridOverlay({
                                             transformOrigin: "top left",
                                         }}
                                     >
-                                        <SlideRenderer slide={slide} density={density} deckMeta={deckMeta} schemaVersion={schemaVersion} />
+                                        <SlideRenderer slide={slide} density={density} deckMeta={deckMeta} schemaVersion={schemaVersion} disableAnimation={true} />
                                     </div>
 
                                     {/* Current slide highlight overlay */}
@@ -220,8 +220,8 @@ interface PresentationClientProps {
 
 const slideVariants = {
     enter: (dir: number) => ({
-        x: dir > 0 ? "100%" : "-100%",
-        opacity: 0,
+        x: dir === 0 ? 0 : dir > 0 ? "100%" : "-100%",
+        opacity: dir === 0 ? 1 : 0,
     }),
     center: { x: 0, opacity: 1 },
     exit: (dir: number) => ({
@@ -234,13 +234,13 @@ export function PresentationClient({ deck, deckId }: PresentationClientProps) {
     const router = useRouter();
     const [density, setDensity] = useState<DensityMode>("full");
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [direction, setDirection] = useState(1);
+    const [direction, setDirection] = useState(0);
     const [showNotes, setShowNotes] = useState(false);
     const [showGrid, setShowGrid] = useState(false);
     const [showFormEditor, setShowFormEditor] = useState(false);
 
     // Track viewed slides to only animate them once
-    const [viewedSlides, setViewedSlides] = useState<Set<number>>(new Set([0]));
+    const [viewedSlides, setViewedSlides] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         setViewedSlides(prev => {
@@ -350,7 +350,7 @@ export function PresentationClient({ deck, deckId }: PresentationClientProps) {
         <TemplateProvider template={deck.meta.template || "status"}>
             {/* Full-viewport slide stage */}
             <div className="fixed inset-0 overflow-hidden bg-white">
-                <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                <AnimatePresence custom={direction} mode="popLayout">
                     <motion.div
                         key={currentIndex}
                         className="absolute inset-0"
@@ -361,7 +361,13 @@ export function PresentationClient({ deck, deckId }: PresentationClientProps) {
                         exit="exit"
                         transition={{ duration: 0.35, ease: [0.32, 0, 0.67, 0] }}
                     >
-                        <SlideRenderer slide={currentSlide} density={density} deckMeta={deck.meta} schemaVersion={deck.schemaVersion || 1} />
+                        <SlideRenderer 
+                            slide={currentSlide} 
+                            density={density} 
+                            deckMeta={deck.meta} 
+                            schemaVersion={deck.schemaVersion || 1} 
+                            disableAnimation={viewedSlides.has(currentIndex)} 
+                        />
                     </motion.div>
                 </AnimatePresence>
 

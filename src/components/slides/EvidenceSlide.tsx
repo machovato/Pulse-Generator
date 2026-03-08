@@ -6,6 +6,10 @@ import { CircleDot } from "lucide-react";
 import { staggerContainer, slideUpItem } from "@/lib/motion";
 import { LayoutWhite } from "./layouts/LayoutWhite";
 import type { LooseSlide } from "@/lib/schema";
+import { Typography } from "../ui/Typography";
+import { CardBase } from "../ui/CardBase";
+
+const MotionCard = motion(CardBase);
 
 interface EvidencePoint {
     metric: string;
@@ -24,15 +28,15 @@ function renderMetric(metricStr: string, isQualitative: boolean) {
         const [before, after] = metricStr.split('→').map(s => s.trim());
         return (
             <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-text-on-emphasis/40 line-through decoration-text-on-emphasis/40 decoration-[3px]" style={{ fontSize: "clamp(24px, 4vw, 42px)" }}>
+                <span className="text-text-muted/60 line-through decoration-text-muted/40 decoration-[3px]" style={{ fontSize: "clamp(24px, 4vw, 42px)" }}>
                     {before}
                 </span>
-                <span className="text-text-on-emphasis/40 font-light" style={{ fontSize: "clamp(24px, 4vw, 42px)" }}>
+                <span className="text-text-muted/40 font-light" style={{ fontSize: "clamp(24px, 4vw, 42px)" }}>
                     →
                 </span>
-                <span className={`font-extrabold ${isQualitative ? 'text-accent-warning' : 'text-accent-success'}`} style={{ fontSize: "clamp(48px, 6vw, 76px)" }}>
+                <Typography as="span" variant="metric" className={isQualitative ? 'text-accent-warning' : 'text-accent-success'}>
                     {after}
-                </span>
+                </Typography>
             </div>
         );
     }
@@ -47,13 +51,13 @@ function renderMetric(metricStr: string, isQualitative: boolean) {
 
             return (
                 <div className="flex flex-col xl:flex-row xl:items-baseline gap-2">
-                    <span className="font-extrabold text-white drop-shadow-md tracking-tight" style={{ fontSize: "clamp(64px, 8vw, 110px)", lineHeight: 0.9 }}>
+                    <Typography as="span" variant="metric" className="text-text-primary drop-shadow-sm tracking-tight">
                         {numPart}
-                    </span>
+                    </Typography>
                     {textPart && (
-                        <span className="text-2xl font-bold text-text-on-emphasis/80 max-w-[250px] leading-tight mt-2 xl:mt-0 xl:ml-3">
+                        <Typography as="span" variant="h2" className="text-text-secondary max-w-[250px] leading-tight mt-2 xl:mt-0 xl:ml-3">
                             {textPart}
-                        </span>
+                        </Typography>
                     )}
                 </div>
             );
@@ -61,9 +65,9 @@ function renderMetric(metricStr: string, isQualitative: boolean) {
     }
 
     return (
-        <span className={`font-extrabold drop-shadow-md tracking-tight text-white`} style={{ fontSize: "clamp(42px, 6vw, 84px)", lineHeight: 1.05 }}>
+        <Typography as="span" variant="metric" className="drop-shadow-sm tracking-tight text-text-primary">
             {metricStr}
-        </span>
+        </Typography>
     );
 }
 
@@ -76,19 +80,16 @@ export function EvidenceSlide({ slide, disableAnimation = false }: { slide: Loos
             <LayoutWhite center={false}>
                 <div className="w-full flex-1 flex flex-col justify-center py-12">
                     <motion.div className="mb-12 shrink-0" variants={slideUpItem(disableAnimation)}>
-                        <p className="text-badge font-semibold uppercase tracking-[0.18em] text-accent-info opacity-60 mb-2">
+                        <Typography variant="eyebrow" className="text-accent-info opacity-60 mb-2">
                             Evidence
-                        </p>
-                        <h2
-                            className="font-bold text-text-primary leading-tight"
-                            style={{ fontSize: "clamp(32px, 4vw, 56px)" }}
-                        >
+                        </Typography>
+                        <Typography as="h2" variant="h1" className="leading-tight mt-0 pt-0">
                             {slide.title}
-                        </h2>
+                        </Typography>
                     </motion.div>
 
                     <div
-                        className={`flex-1 grid gap-6 w-full mt-4 items-stretch
+                        className={`flex-1 grid gap-6 w-full mt-4 items-start
                     ${points.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' :
                                 points.length === 2 ? 'grid-cols-2 max-w-5xl mx-auto' :
                                     'grid-cols-3 w-full'}`}
@@ -97,36 +98,34 @@ export function EvidenceSlide({ slide, disableAnimation = false }: { slide: Loos
                             const isQualitative = point.type === "qualitative";
 
                             return (
-                                <motion.div
+                                <MotionCard
                                     key={i}
-                                    className={`flex flex-col justify-between p-8 md:p-10 rounded-2xl shadow-xl transition-all h-full border border-border-default
-                                    ${isQualitative
-                                            ? 'border-t-[10px] border-t-accent-warning bg-surface-primary'
-                                            : 'border-t-[10px] border-t-accent-info bg-surface-primary'
-                                        }
-                                `}
-                                    style={{ minHeight: "280px" }}
+                                    accent={isQualitative ? "warning" : "info"}
+                                    className="flex flex-col justify-between shadow-xl transition-all h-fit bg-surface-primary"
                                     variants={slideUpItem(disableAnimation)}
                                     whileHover={{ y: -4, transition: { duration: 0.2 } }}
                                 >
-                                    <div className="mb-auto">
-                                        <p className="text-sm font-bold uppercase tracking-[0.15em] text-text-on-emphasis/60 mb-4">
-                                            {point.label}
-                                        </p>
-                                        <div className="mb-6 leading-none">
-                                            {renderMetric(point.metric, isQualitative)}
+                                    {/* Card content wrapper (CardBase usually handles padding, but we override padding to 0 and apply standard here to match the hover effects/styling. Actually, CardBase uses Var(--spacing-card-padding), so let's let CardBase apply padding naturally, since p-8 md:p-10 is standard card padding anyway. Let's remove padding: 0 from above) */}
+                                    <div className="flex flex-col h-full" style={{ padding: "var(--spacing-card-padding)" }}>
+                                        <div>
+                                            <Typography variant="metric-unit" className="opacity-90 tracking-wide font-bold mb-4 drop-shadow-sm">
+                                                {point.label}
+                                            </Typography>
+                                            <div className="mb-2 leading-none">
+                                                {renderMetric(point.metric, isQualitative)}
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 relative bg-surface-muted p-5 rounded-xl border border-border-default/50">
+                                            <Typography variant="body" className="font-medium leading-relaxed mb-4">
+                                                {isQualitative ? `"${point.body}"` : point.body}
+                                            </Typography>
+                                            <Typography variant="caption" className="text-accent-info font-bold flex items-center gap-2 before:content-['—'] before:mr-1">
+                                                {point.source}
+                                            </Typography>
                                         </div>
                                     </div>
-
-                                    <div className="mt-10 relative bg-surface-muted p-5 rounded-xl border border-border-default/50">
-                                        <p className="text-lg text-text-primary font-medium leading-relaxed mb-4">
-                                            {isQualitative ? `"${point.body}"` : point.body}
-                                        </p>
-                                        <p className="text-[13px] font-bold uppercase tracking-wider text-accent-info flex items-center gap-2 before:content-['—'] before:mr-1">
-                                            {point.source}
-                                        </p>
-                                    </div>
-                                </motion.div>
+                                </MotionCard>
                             );
                         })}
                     </div>
